@@ -2,10 +2,9 @@
 using BusinessLogicLayer.IServices;
 using DomainLayer.Model;
 using DomainLayer.UserDto;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers
@@ -14,8 +13,8 @@ namespace Blog.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        IUserService _userService;
-        IMapper _imapper;
+        private readonly IUserService _userService;
+        private readonly IMapper _imapper;
 
         public UserController(IUserService userService, IMapper imapper)
         {
@@ -23,75 +22,99 @@ namespace Blog.Controllers
             _imapper = imapper;
         }
 
-        //endpoint to get all users
+        // ✅ Login endpoint (returns JWT token)
+     
+        // ✅ Get all users
+        [Authorize]
         [HttpGet]
+
+
         public IActionResult GetUsers()
         {
-            // This method is synchronous
             return Ok(_imapper.Map<List<UserDto>>(_userService.GetAllUsers()));
         }
 
-        //endpoint to get one user
+        // ✅ Get a single user by ID
+        [Authorize]
         [HttpGet("{id}")]
+
         public async Task<IActionResult> GetUser(string id)
         {
-            // This method is asynchronous
-            User? user = await _userService.GetUser(id);
+            var user = await _userService.GetUser(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            UserDto existingUser = _imapper.Map<UserDto>(user);
-            return Ok(user);
+            return Ok(_imapper.Map<UserDto>(user));
         }
 
-        //endpoint to create user
+        // ✅ Create a user
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
-
-            // Call the service to create the user
             var createdUser = await _userService.CreateUser(userDto);
-
             if (createdUser == null)
             {
-                return BadRequest("User creation failed."); // Return error message
+                return BadRequest("User creation failed.");
             }
 
-            // Map the created user to a DTO for the response
-            var resultDto = _imapper.Map<UserDto>(createdUser);
-
-            return Ok(resultDto); // Return the created user DTO
+            return Ok(_imapper.Map<UserDto>(createdUser));
         }
 
-        //endpoint to update a user
+        // ✅ Update user
+        [Authorize]
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto userdto)
+
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto userDto)
         {
-            User existingUser = _imapper.Map<User>(userdto);
-            // Assuming this is asynchronous, but modify if it's not
-            User? userUpdate = await _userService.UpdateUser(existingUser);
-            if (userUpdate is null)
+            var existingUser = _imapper.Map<User>(userDto);
+            var updatedUser = await _userService.UpdateUser(existingUser);
+
+            if (updatedUser == null)
             {
                 return BadRequest();
             }
 
-            UserDto newUser = _imapper.Map<UserDto>(userUpdate);
-            return Ok(newUser);
+            return Ok(_imapper.Map<UserDto>(updatedUser));
         }
 
-        //endpoint to delete a user
+        // ✅ Delete user
+        [Authorize]
         [HttpDelete("{id}")]
+
         public async Task<IActionResult> DeleteUser(string id)
         {
-            // Assuming this is asynchronous, but modify if it's not
             bool isDeleted = await _userService.DeleteUser(id);
             if (!isDeleted)
             {
                 return BadRequest();
             }
+
             return Ok(new { Message = "Deleted successfully" });
         }
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            if (string.IsNullOrEmpty(loginDto.Email) || string.IsNullOrEmpty(loginDto.Password))
+            {
+                return BadRequest("Email and password are required.");
+            }
+
+            var token = await _userService.LoginUser(loginDto.Email, loginDto.Password);
+            if (token == null)
+            {
+                return Unauthorized(new { message = "Invalid credentials" });
+            }
+
+            return Ok(new { Token = token });
+        }
+
+
+
     }
+
+
 }

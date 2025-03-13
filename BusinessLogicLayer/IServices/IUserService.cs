@@ -43,5 +43,15 @@ namespace BusinessLogicLayer.IServices
         /// <param name="id">The user ID to delete</param>
         /// <returns>Boolean true if deleted successfully, otherwise false</returns>
         Task<bool> DeleteUser(string id);
+
+
+        /// <summary>
+        /// login for user 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        Task<string?> LoginUser(string email, string password);
+
     }
 }

@@ -5,6 +5,7 @@ using DomainLayer.CommentDto;
 using DomainLayer.DTO;
 using DomainLayer.FollowerDto;
 using DomainLayer.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,20 +25,22 @@ namespace Blog.Controllers
         }
 
         //endpoint to get all Followers
+        [Authorize]
         [HttpGet]
         public IActionResult GetFollower()
         {
-            
+
             return Ok(_imapper.Map<List<FollowerDto>>(_followerService.GetAllFollower()));
 
         }
 
         //endpoint to create Follower
+        [Authorize]
         [HttpPost]
         public IActionResult CreateFollower([FromBody] CreateFollowerDto Followerdto)
         {
             Follower newFollower = _imapper.Map<Follower>(Followerdto);
- 
+
             Follower? creaeFollower = _followerService.CreateFollower(newFollower, out string message);
 
             if (creaeFollower == null)
@@ -51,6 +54,7 @@ namespace Blog.Controllers
         }
 
         //endpoint to delete a Follower
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult DeleteFollower(int id) // Add the parameter type (int)
         {

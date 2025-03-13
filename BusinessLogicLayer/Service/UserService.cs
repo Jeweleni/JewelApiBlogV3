@@ -1,78 +1,60 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IServices;
-using DataAccessLayer.Repository;
 using DataAccessLayer.UnitOfWorkFolder;
 using DomainLayer.Model;
 using DomainLayer.UserDto;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using BusinessLogicLayer.Interface;
 
 namespace BusinessLogicLayer.Service
 {
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        IMapper _imapper;
+        private readonly IMapper _imapper;
+        private readonly ITokenGenerator _tokenGenerator;
+        private readonly UserManager<User> _userManager;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper imapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper imapper, ITokenGenerator tokenGenerator, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
             _imapper = imapper;
+            _tokenGenerator = tokenGenerator;
+            _userManager = userManager;
         }
 
         public async Task<User?> CreateUser(CreateUserDto userDto)
         {
-            // Validate input
-            if (string.IsNullOrEmpty(userDto.FirstName) || // Use PascalCase: FirstName
-                string.IsNullOrEmpty(userDto.LastName) ||  // Use PascalCase: LastName
+            if (string.IsNullOrEmpty(userDto.FirstName) ||
+                string.IsNullOrEmpty(userDto.LastName) ||
                 string.IsNullOrEmpty(userDto.Email) ||
                 string.IsNullOrEmpty(userDto.Password))
             {
                 return null;
             }
 
-            // Map DTO to User entity
             var user = _imapper.Map<User>(userDto);
-            user.UserName = userDto.Email; // Set UserName to Email (required by Identity)
+            user.UserName = userDto.Email;
 
-            // Create the user
             var createdUser = await _unitOfWork.userRepository.Create(user, userDto.Password);
-
             return createdUser;
         }
 
-        public List<User> GetAllUsers()
-        {
-            return _unitOfWork.userRepository.GetAll();
-        }
+        public List<User> GetAllUsers() => _unitOfWork.userRepository.GetAll();
 
-        public async Task<User?> GetUser(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return null;
-            }
-
-            return await _unitOfWork.userRepository.Get(id);
-        }
+        public async Task<User?> GetUser(string id) => await _unitOfWork.userRepository.Get(id);
 
         public async Task<User?> UpdateUser(User user)
         {
-            if (user == null || string.IsNullOrEmpty(user.Id))
-            {
-                return null;
-            }
-
             var existingUser = await _unitOfWork.userRepository.Get(user.Id);
-            if (existingUser == null)
-            {
-                return null;
-            }
+            if (existingUser == null) return null;
 
-            // Update only non-password fields
             existingUser.FirstName = user.FirstName;
-            existingUser.FirstName = user.FirstName;
+            existingUser.LastName = user.LastName;
             existingUser.Email = user.Email;
 
             await _unitOfWork.userRepository.Update(existingUser);
@@ -81,20 +63,25 @@ namespace BusinessLogicLayer.Service
 
         public async Task<bool> DeleteUser(string id)
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                return false;
-            }
-
             var user = await _unitOfWork.userRepository.Get(id);
-            if (user == null)
-            {
-                return false;
-            }
+            if (user == null) return false;
 
             await _unitOfWork.userRepository.Delete(user);
-
             return true;
         }
+
+        // ✅ Implement LoginUser
+        public async Task<string?> LoginUser(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || string.IsNullOrEmpty(user.Email)) return null;
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
+            if (!isPasswordValid) return null;
+
+            // ✅ Pass both userId and email to GenerateToken
+            return _tokenGenerator.GenerateToken(user.Id, user.Email);
+        }
+
     }
 }

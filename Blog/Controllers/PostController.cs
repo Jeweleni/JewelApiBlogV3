@@ -4,6 +4,7 @@ using BusinessLogicLayer.Service;
 using DomainLayer.Model;
 using DomainLayer.PostDto;
 using DomainLayer.UserDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace Blog.Controllers
         }
 
         //endpoint to get all posts
+        [Authorize]
         [HttpGet]
         public IActionResult GetPost()
         {
@@ -31,10 +33,11 @@ namespace Blog.Controllers
         }
 
         //endpoint to get one post
+        [Authorize]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            Post? post =  _ipostService.GetPost(id);
+            Post? post = _ipostService.GetPost(id);
 
             if (post == null)
             {
@@ -65,11 +68,12 @@ namespace Blog.Controllers
         }
 
         //endpoint to update a post
+        [Authorize]
         [HttpPut]
         public IActionResult UpdatePost([FromBody] UpdatePostDto postdto)
         {
             Post existingPost = _imapper.Map<Post>(postdto);
-            
+
             Post? postUpdate = _ipostService.UpdatePost(existingPost, out string message);
 
             if (postUpdate is null)
@@ -81,7 +85,8 @@ namespace Blog.Controllers
 
             return Ok(newPost);
         }
-
+        // delete post
+        [Authorize]
         [HttpDelete]
         public IActionResult DeletePost(int id)
 

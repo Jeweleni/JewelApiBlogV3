@@ -5,6 +5,7 @@ using DomainLayer.CommentDto;
 using DomainLayer.CommentDtp;
 using DomainLayer.Model;
 using DomainLayer.UserDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,7 @@ namespace Blog.Controllers
 
 
         //endpoint to get all comments
+        [Authorize]
         [HttpGet]
         public IActionResult GetComment()
         {
@@ -33,6 +35,7 @@ namespace Blog.Controllers
 
 
         //endpoint to get one comment
+        [Authorize]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -50,6 +53,7 @@ namespace Blog.Controllers
 
 
         //endpoint to create comment
+        [Authorize]
         [HttpPost]
         public IActionResult CreateComment([FromBody] CreatCommentDto commentdto)
         {
@@ -68,6 +72,7 @@ namespace Blog.Controllers
         }
 
         //endpoint to update a post
+        [Authorize]
         [HttpPut]
         public IActionResult UpdateComment([FromBody] UpdateCommentDto commentdto)
         {
@@ -86,6 +91,7 @@ namespace Blog.Controllers
         }
 
         //endpoint to delete a comment
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult DeleteComment(int id)
         {
