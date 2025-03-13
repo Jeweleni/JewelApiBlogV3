@@ -12,7 +12,7 @@ namespace DomainLayer.Model
         //setting the table to varchar in the database
         [Column(TypeName = "varchar(200)")]
 
-        public required string Author { get; set; }
+      //  public required string Author { get; set; }
 
         public required string Content { get; set; }
 

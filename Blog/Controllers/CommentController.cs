@@ -2,6 +2,7 @@
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Service;
 using DomainLayer.CommentDto;
+using DomainLayer.CommentDtp;
 using DomainLayer.Model;
 using DomainLayer.UserDto;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +26,7 @@ namespace Blog.Controllers
 
         //endpoint to get all comments
         [HttpGet]
-        public IActionResult GetPost()
+        public IActionResult GetComment()
         {
             return Ok(_imapper.Map<List<CommentDto>>(_icommentService.GetAllComments()));
         }
@@ -50,7 +51,7 @@ namespace Blog.Controllers
 
         //endpoint to create comment
         [HttpPost]
-        public IActionResult CreatePost([FromBody] CommentDto commentdto)
+        public IActionResult CreateComment([FromBody] CreatCommentDto commentdto)
         {
             Comment newComment = _imapper.Map<Comment>(commentdto);
 
@@ -68,7 +69,7 @@ namespace Blog.Controllers
 
         //endpoint to update a post
         [HttpPut]
-        public IActionResult UpdatePost([FromBody] UpdateCommentDto commentdto)
+        public IActionResult UpdateComment([FromBody] UpdateCommentDto commentdto)
         {
             Comment existingComment = _imapper.Map<Comment>(commentdto);
 
