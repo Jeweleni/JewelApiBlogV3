@@ -84,5 +84,19 @@ namespace Blog.Controllers
 
             return Ok(latestcomment);
         }
+
+        //endpoint to delete a comment
+        [HttpDelete("{id}")]
+        public IActionResult DeleteComment(int id)
+        {
+            bool isDeleted = _icommentService.DeleteComment(id, out string message);
+
+            if (!isDeleted)
+            {
+                return NotFound(message);
+            }
+
+            return NoContent();
+        }
     }
 }

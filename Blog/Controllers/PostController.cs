@@ -52,14 +52,14 @@ namespace Blog.Controllers
         {
             Post newPost = _imapper.Map<Post>(postdto);
 
-            Post? craetePost = _ipostService.CreatePost(newPost, out string message);
+            Post? createPost = _ipostService.CreatePost(newPost, out string message);
 
-            if (craetePost == null)
+            if (createPost == null)
             {
                 return BadRequest(message);
             }
 
-            PostDto existingPost = _imapper.Map<PostDto>(craetePost);
+            PostDto existingPost = _imapper.Map<PostDto>(createPost);
 
             return Ok(existingPost);
         }
@@ -80,6 +80,20 @@ namespace Blog.Controllers
             PostDto newPost = _imapper.Map<PostDto>(postUpdate);
 
             return Ok(newPost);
+        }
+
+        [HttpDelete]
+        public IActionResult DeletePost(int id)
+
+        {
+            bool isDeleted = _ipostService.DeletePost(id, out string message);
+
+            if (!isDeleted)
+            {
+                return BadRequest(message);
+            }
+
+            return Ok(new { Message = message });
         }
     }
 }

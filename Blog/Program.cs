@@ -28,6 +28,8 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFollowerService, FollowerService>();
+
 
 // Configure Identity
 builder.Services.AddIdentity<User, Role>()

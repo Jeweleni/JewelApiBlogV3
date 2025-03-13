@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DomainLayer.Model
 {
     public class Comment : BaseModel
     {
-        //setting the table to varchar in the database
+        // Setting the column type to VARCHAR(200) in the database
         [Column(TypeName = "varchar(200)")]
-
-      //  public required string Author { get; set; }
+        //public required string Author { get; set; }
 
         public required string Content { get; set; }
 
-        [ForeignKey("PostId")]
-        public required Post post { get; set; }
+        // Foreign key for Post
         public int PostId { get; set; }
 
-        [ForeignKey("UserId")]
-        public required User user { get; set; }
+        [ForeignKey("PostId")]
+        public required Post Post { get; set; } // Updated property name to PascalCase
+
+        // Foreign key for User (Identity)
         public required string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public required User User { get; set; } // Updated property name to PascalCase
     }
 }

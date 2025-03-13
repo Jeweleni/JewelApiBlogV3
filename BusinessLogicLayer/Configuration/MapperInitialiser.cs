@@ -2,6 +2,7 @@
 using DomainLayer.CommentDto;
 using DomainLayer.CommentDtp;
 using DomainLayer.DTO;
+using DomainLayer.FollowerDto;
 using DomainLayer.LikeDto;
 using DomainLayer.Model;
 using DomainLayer.PostDto;
@@ -38,6 +39,11 @@ namespace BusinessLogicLayer.Configuration
             CreateMap<Like, CreateLikeDto>().ReverseMap();
             //CreateMap<Like, UpdateLikeDto>().ReverseMap();
             CreateMap<Like, LikeDto>().ReverseMap();
+
+            // Mappers for followers
+
+            CreateMap<Follower, CreateFollowerDto>().ReverseMap();
+            CreateMap<Follower, FollowerDto>().ReverseMap();
         }
     }
 }

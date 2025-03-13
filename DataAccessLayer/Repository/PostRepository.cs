@@ -48,6 +48,11 @@ namespace DataAccessLayer.Repository
             return _applicationDbContext.Posts.ToList();
         }
 
+        public object GetById(int postId)
+        {
+            throw new NotImplementedException();
+        }
+
         //function to update a post
         public Post? Update(Post post)
         {

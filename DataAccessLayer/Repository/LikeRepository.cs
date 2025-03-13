@@ -33,6 +33,11 @@ namespace DataAccessLayer.Repository
             _applicationDbContext.SaveChanges();
         }
 
+        public object Find(Func<object, bool> value)
+        {
+            throw new NotImplementedException();
+        }
+
         public Like? Get(int id)
         {
             Like? like = _applicationDbContext.Likes.Find(id);
